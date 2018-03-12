@@ -5,7 +5,7 @@
  * @package Kinone
  */
 
-namespace Kinone;
+namespace Kinone\Kinone;
 
 class Application
 {

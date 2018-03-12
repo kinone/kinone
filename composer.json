@@ -13,6 +13,6 @@
     },
 
     "autoload": {
-        "psr-4": {"Kinone\\": "src/"}
+        "psr-4": {"Kinone\\Kinone\\": "src/"}
     }
 }

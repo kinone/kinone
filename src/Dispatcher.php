@@ -9,6 +9,7 @@ namespace Kinone\Kinone;
 
 use Kinone\Kinone\Route\CallableRoute;
 use Kinone\Kinone\Route\StaticRoute;
+use ReflectionClass;
 
 class Dispatcher
 {
@@ -29,16 +30,25 @@ class Dispatcher
         $this->app = $app;
     }
 
-    public function bind(string $prefix, \ReflectionClass $ins)
+    /**
+     * @param string $prefix
+     * @param ReflectionClass $ins
+     */
+    public function bind(string $prefix, ReflectionClass $ins)
     {
         if ($prefix[0] != '/') {
             $prefix = '/' . $prefix;
         }
 
-        $collection = StaticRoute::resolve($prefix, $ins);
+        $collection = StaticRoute::resolve($prefix, $ins, $this->app);
         $this->routes->addCollection($collection);
     }
 
+    /**
+     * @param string $pattern
+     * @param callable $handler
+     * @return CallableRoute
+     */
     public function match(string $pattern, callable $handler)
     {
         $route = new CallableRoute($pattern, $handler);

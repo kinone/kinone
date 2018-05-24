@@ -9,7 +9,7 @@ namespace Kinone\Kinone;
 
 use Kinone\Kinone\Route\RouteInterface;
 
-class RouteCollection
+final class RouteCollection
 {
     /**
      * @var RouteInterface[]
@@ -21,21 +21,30 @@ class RouteCollection
         $this->routes = [];
     }
 
+    /**
+     * @param RouteInterface $route
+     */
     public function add(RouteInterface $route)
     {
         $this->routes[] = $route;
     }
 
-    public function addCollection(self $collection)
+    /**
+     * @param self $collection
+     * @return RouteCollection
+     */
+    public function addCollection(RouteCollection $collection)
     {
         foreach ($collection->all() as $route) {
             $this->add($route);
         }
+
+        return $this;
     }
 
     /**
      * @param Request $request
-     * @return RouteInterface |bool
+     * @return RouteInterface|bool
      */
     public function match(Request $request)
     {

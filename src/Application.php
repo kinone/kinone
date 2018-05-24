@@ -53,6 +53,11 @@ class Application extends Container
         $this->chain->register(new HandleException());
     }
 
+    /**
+     * @param string $prefix
+     * @param string $classname
+     * @return Application
+     */
     public function mount(string $prefix, string $classname)
     {
         try {
@@ -70,6 +75,11 @@ class Application extends Container
         return $this;
     }
 
+    /**
+     * @param string $pattern
+     * @param callable $handler
+     * @return Application
+     */
     public function get(string $pattern, callable $handler)
     {
         $this->dispatcher->match($pattern, $handler)->method('GET');
@@ -77,6 +87,11 @@ class Application extends Container
         return $this;
     }
 
+    /**
+     * @param string $pattern
+     * @param callable $handler
+     * @return Application
+     */
     public function post(string $pattern, callable $handler)
     {
         $this->dispatcher->match($pattern, $handler)->method('POST');
@@ -84,14 +99,28 @@ class Application extends Container
         return $this;
     }
 
+    /**
+     * @param string $pattern
+     * @param callable $handler
+     *
+     * @return Application
+     */
     public function route(string $pattern, callable $handler)
     {
         $this->dispatcher->match($pattern, $handler)->method('GET|POST');
+
+        return $this;
     }
 
-    public function addPlugin(PluginInterface $plugin)
+    /**
+     * @param PluginInterface $plugin
+     * @return Application
+     */
+    public function plug(PluginInterface $plugin)
     {
         $this->chain->register($plugin);
+
+        return $this;
     }
 
     /**
@@ -123,14 +152,14 @@ class Application extends Container
         $chain = clone $this->chain;
 
         if ($handler instanceof Handler) {
-            $controller = $handler->getController($this);
+            $controller = $handler->getController();
             if (is_callable($controller)) {
                 $controller($chain);
             }
         }
 
         $getResponse = function () use ($handler) {
-            $res = $handler($this);
+            $res = call_user_func_array($handler, [$this]);
 
             if ($res instanceof Response) {
                 return $res;

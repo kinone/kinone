@@ -7,14 +7,19 @@
 
 namespace Kinone\Kinone\Route;
 
+use Kinone\Kinone\Application;
 use Kinone\Kinone\Request;
 use Kinone\Kinone\RouteCollection;
 use ReflectionClass;
 
-class StaticRoute extends AbstractRoute
+final class StaticRoute extends AbstractRoute
 {
     const DEFAULT_ACTION = 'index';
 
+    /**
+     * @param Request $request
+     * @return bool
+     */
     public function match(Request $request): bool
     {
         $pathinfo = strtolower(rtrim($request->getPathInfo(), '/'));
@@ -23,19 +28,21 @@ class StaticRoute extends AbstractRoute
             $pathinfo . '/' . self::DEFAULT_ACTION == $this->path;
     }
 
+    /**
+     * @return callable
+     */
     public function getHandler(): callable
     {
-        list($ins, $method) = call_user_func($this->handler);
-
-        return new Handler($ins, $method);
+        return call_user_func($this->handler);
     }
 
     /**
      * @param string $prefix
      * @param ReflectionClass $ins
+     * @param Application $app
      * @return RouteCollection
      */
-    public static function resolve(string $prefix, ReflectionClass $ins)
+    public static function resolve(string $prefix, ReflectionClass $ins, Application $app)
     {
         $methods = $ins->getMethods(\ReflectionMethod::IS_PUBLIC);
 
@@ -46,8 +53,8 @@ class StaticRoute extends AbstractRoute
                 continue;
             }
 
-            $callable = function () use ($ins, $method) {
-                return [$ins, $method];
+            $callable = function () use ($method, $app) {
+                return new Handler($method, $app);
             };
 
             $path = rtrim($prefix, '/') . '/' . substr($name, 0, -6);

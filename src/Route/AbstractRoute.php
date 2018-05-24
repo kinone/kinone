@@ -33,11 +33,17 @@ abstract class AbstractRoute implements RouteInterface
         $this->handler = $handler;
     }
 
+    /**
+     * @return callable
+     */
     public function getHandler(): callable
     {
         return $this->handler;
     }
 
+    /**
+     * @param string $method
+     */
     public function method(string $method)
     {
         $this->methods = explode('|', $method);

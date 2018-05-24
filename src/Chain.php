@@ -27,17 +27,25 @@ class Chain
         $this->app = $app;
     }
 
-    public function build(callable $callable)
+    /**
+     * @param callable $callable
+     * @return callable
+     */
+    public function build(callable $callable): callable
     {
-        return array_reduce(array_reverse($this->plugins), function(callable $next, PluginInterface $plugin) {
-            return function() use ($plugin, $next) {
+        return array_reduce(array_reverse($this->plugins), function (callable $next, PluginInterface $plugin) {
+            return function () use ($plugin, $next) {
                 return $plugin->apply($this->app, $next);
             };
-        }, function() use ($callable) {
+        }, function () use ($callable) {
             return call_user_func($callable);
         });
     }
 
+    /**
+     * @param PluginInterface $plugin
+     * @return $this
+     */
     public function register(PluginInterface $plugin)
     {
         $this->plugins[] = $plugin;

@@ -14,40 +14,47 @@ use Kinone\Kinone\Exception;
 class Handler
 {
     /**
-     * @var \ReflectionClass
-     */
-    private $refc;
-
-    /**
      * @var \ReflectionMethod
      */
-    private $refm;
+    private $method;
 
-    public function __construct(\ReflectionClass $refc, \ReflectionMethod $refm)
+    /**
+     * @var Application
+     */
+    private $app;
+
+    /**
+     * @var Controller
+     */
+    private $controller;
+
+    public function __construct(\ReflectionMethod $method, Application $app)
     {
-        $this->refc = $refc;
-        $this->refm = $refm;
+        $this->method = $method;
+        $this->app = $app;
+        $this->controller = null;
     }
 
     /**
-     * @param Application $app
      * @return Controller
      */
-    public function getController(Application $app)
+    public function getController()
     {
-        static $ins = null;
-        if (null == $ins) {
-            $ins = $this->refc->newInstance($app);
+        if (null == $this->controller) {
+            $cls = $this->method->getDeclaringClass();
+            $ins = $cls->newInstance($this->app);
             if (!$ins instanceof Controller) {
                 throw new Exception(sprintf("Types error"));
             }
+
+            $this->controller = $ins;
         }
 
-        return $ins;
+        return $this->controller;
     }
 
-    public function __invoke(Application $app)
+    public function __invoke()
     {
-        return $this->refm->invoke($this->getController($app));
+        return $this->method->invoke($this->getController(), func_get_args());
     }
 }

@@ -11,6 +11,13 @@ use Kinone\Kinone\Application;
 
 class HandleException implements PluginInterface
 {
+    /**
+     * The callable {$next} should be called and return the result.
+     *
+     * @param Application $app
+     * @param callable $next
+     * @return mixed
+     */
     public function apply(Application $app, callable $next)
     {
         try {

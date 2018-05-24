@@ -11,6 +11,10 @@ use Kinone\Kinone\Request;
 
 class CallableRoute extends AbstractRoute
 {
+    /**
+     * @param Request $request
+     * @return bool
+     */
     public function match(Request $request): bool
     {
         if (!in_array($request->getMethod(), $this->methods)) {
